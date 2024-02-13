@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html class="ui-page-login">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <link href="css/mui.min.css" rel="stylesheet" />
+    <link href="css/style.css" rel="stylesheet" />
+    <style>
+        .area {
+            margin: 20px auto 0px auto;
+        }
+        .mui-input-group:first-child {
+            margin-top: 20px;
+        }
+        .mui-input-group label {
+            width: 22%;
+        }
+        .mui-input-row label~input,
+        .mui-input-row label~select,
+        .mui-input-row label~textarea {
+            width: 78%;
+        }
+        .mui-checkbox input[type=checkbox],
+        .mui-radio input[type=radio] {
+            top: 6px;
+        }
+        .mui-content-padded {
+            margin-top: 25px;
+        }
+        .mui-btn {
+            padding: 10px;
+        }
+        .mui-input-row label~input, .mui-input-row label~select, .mui-input-row label~textarea{
+            margin-top: 1px;
+        }
+        .mui-btn-primary{
+            background-color: #ffa52a;
+            border-style: none;
+        }
+    </style>
+</head>
+
+<body>
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">Register for an account</h1>
+</header>
+<div class="mui-content">
+
+    <!--
+    <div class="mui-input-row">
+        <label>账号</label>
+        <input id='account' type="text" class="mui-input-clear mui-input" placeholder="请输入账号">
+    </div>
+    -->
+
+
+    <div class="mui-content-padded">
+        
+        <div class="center">
+            <select id="cameraSelect"></select>
+        </div>
+        <button id="startButton" class="mui-btn mui-btn-block mui-btn-primary">开始扫码</button>
+        <div id="reader"></div>
+    </div>
+</div>
+<script src="js/mui.min.js"></script>
+<script src="js/app.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const cameraSelect = document.getElementById("cameraSelect");
+        const startButton = document.getElementById("startButton");
+        let html5QrCode;
+
+        Html5Qrcode.getCameras().then(cameras => {
+            cameras.forEach((camera, index) => {
+                const option = document.createElement("option");
+                option.value = camera.id;
+                option.text = camera.label || `摄像头 ${index}`;
+                cameraSelect.appendChild(option);
+            });
+        });
+
+        startButton.addEventListener('click', () => {
+            const selectedCameraId = cameraSelect.value;
+            if (!selectedCameraId) {
+                alert("请选择一个摄像头");
+                return;
+            }
+
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    startScan(selectedCameraId);
+                });
+            } else {
+                startScan(selectedCameraId);
+            }
+        });
+
+        function startScan(cameraId) {
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            html5QrCode.start(
+                cameraId,
+                config,
+                (decodedText, decodedResult) => {
+                    alert(`扫码结果: ${decodedText}`);
+                    html5QrCode.stop().then(() => {
+                        console.log("扫描已停止");
+                    }).catch(err => {
+                        console.error(`停止扫描时发生错误: ${err}`);
+                    });
+                },
+                (errorMessage) => {
+                    console.error(errorMessage);
+                }
+            ).catch(err => console.error(`启动二维码扫描失败: ${err}`));
+        }
+    });
+</script>
+</body>
+
+</html>
