@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+
+		<style>
+			ul {
+				font-size: 14px;
+				color: #8f8f94;
+			}
+			.mui-btn {
+				padding: 10px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="padding-right: 15px;">
+			<h1 class="mui-title">Login</h1>
+			<button id='setting' class=" mui-pull-right mui-btn-link">Setting</button>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<p>
+					Hello,  <span id='account'></span>You have successfully logged in.
+					<p>This is the CondoQR home page.</p>
+				</p>
+				
+<div class="wrapper">
+      <header>
+        <h1>QR Code Generator</h1>
+        <p>Paste a url or enter text to create QR code</p>
+      </header>
+      <div class="form">
+        <input type="text" spellcheck="false" placeholder="Enter text or url">
+        <button>Generate QR Code</button>
+      </div>
+      <div class="qr-code">
+        <img src="" alt="qr-code">
+      </div>
+    </div>
+				<!--<button  class="mui-btn mui-btn-block mui-btn-primary">Setting</button>-->
+				<!--
+				<button id='exit' class="mui-btn mui-btn-block mui-btn-green">Close</button>
+                <button id='logout' class="mui-btn mui-btn-red mui-btn-block">Logout</button>
+                -->
+			</div>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/app.js"></script>
+		<script>
+			(function($, doc) {
+				$.init();
+				var settings = app.getSettings();
+				var account = doc.getElementById('account');
+				//
+				window.addEventListener('show', function() {
+					var state = app.getState();
+					account.innerText = state.account;
+				}, false);
+				$.plusReady(function() {
+					var settingPage = $.preload({
+						"id": 'setting',
+						"url": 'setting.html'
+					});
+					//设置
+					var settingButton = doc.getElementById('setting');
+					//settingButton.style.display = settings.autoLogin ? 'block' : 'none';
+					settingButton.addEventListener('tap', function(event) {
+						$.openWindow({
+							id: 'setting',
+							show: {
+								aniShow: 'pop-in'
+							},
+							styles: {
+								popGesture: 'hide'
+							},
+							waiting: {
+								autoShow: false
+							}
+						});
+					});
+					//--
+					$.oldBack = mui.back;
+					var backButtonPress = 0;
+					$.back = function(event) {
+						backButtonPress++;
+						if (backButtonPress > 1) {
+							plus.runtime.quit();
+						} else {
+							plus.nativeUI.toast('Press again to exit the application');
+						}
+						setTimeout(function() {
+							backButtonPress = 0;
+						}, 1000);
+						return false;
+					};
+				});
+			}(mui, document));
+			
+			const wrapper = document.querySelector(".wrapper"),
+			qrInput = wrapper.querySelector(".mui-content account"),
+			generateBtn = wrapper.querySelector(".form button"),
+			qrImg = wrapper.querySelector(".qr-code img");
+			let preValue;
+			var id = document.getElementById("account").value;
+			
+			generateBtn.addEventListener("click", () => {
+
+			    generateBtn.innerText = "Generating QR Code...";
+			    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${id}`;
+			    qrImg.addEventListener("load", () => {
+			        wrapper.classList.add("active");
+			        generateBtn.innerText = "Generate QR Code";
+			    });
+			});
+			
+			qrInput.addEventListener("keyup", () => {
+			    if(!qrInput.value.trim()) {
+			        wrapper.classList.remove("active");
+			        preValue = "";
+			    }
+			});
+		</script>
+	</body>
+
+</html>
