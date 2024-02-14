@@ -126,6 +126,53 @@
 		<script src="js/mui.enterfocus.js"></script>
 		<script src="js/app.js"></script>
 		<script>
+			var user_name;
+			document.addEventListener('DOMContentLoaded', function() {
+				var loginForm = document.getElementById('login-form');
+				loginForm.addEventListener('submit', function(event) {
+					event.preventDefault();
+		
+					var username = document.getElementById('account').value;
+					window.user_name = document.getElementById('account').value;
+					var password = document.getElementById('password').value;
+					
+					var formData = new FormData();
+					formData.append('username', username);
+					formData.append('password', password);
+		
+					fetch('https://ts.tuotuohome.asia/login.php', {
+						method: 'POST',
+						body: formData
+					})
+					.then(response => response.json())
+					.then(data => {
+						if (data.success) {
+							// 更新全局变量userOccupation
+							userOccupation = data.occupation;
+		
+							// 使用更新后的全局变量来决定跳转
+							if (userOccupation === 'guard') {
+								window.location.href = 'guard_main.html';
+							} else if (userOccupation === 'rider') {
+								window.location.href = 'rider_main.html';
+							} else {
+								alert('登录成功，但未找到匹配的职业页面');
+							}
+						} else {
+							alert(data.message);
+						}
+					})
+					.catch(error => {
+						console.error('Error:', error);
+						alert('登录请求失败');
+					});
+					
+				});
+			});
+		
+		
+		</script>
+		<script>
 			(function($, doc) {
 				$.init({
 					statusBarBackground: '#f7f7f7'
@@ -137,45 +184,49 @@
 					var mainPage = plus.webview.getWebviewById("main");
 					var main_loaded_flag = false;
 
+
 					var toMain = function() {
-						var loginForm = document.getElementById('login-form');
-						loginForm.addEventListener('submit', function(event) {
-							event.preventDefault();
+					// 发送请求到服务器获取用户职业信息
+					fetch('https://ts.tuotuohome.asia/check_occu.php', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded',
+						},
+						body: 'username=' + encodeURIComponent(document.getElementById('account').value) // 假设你有用户的用户名
+					})
+					.then(response => response.json())
+					.then(data => {
+						if(data.success) {
+							// 根据职业信息决定跳转到哪个页面
+							var pageUrl = '';
+							switch(data.occupation) {
+								case 'guard':
+									pageUrl = 'guard_main.html';
+									break;
+								case 'rider':
+									pageUrl = 'rider_main.html';
+									break;
+								default:
+									console.log('未知职业');
+									return; // 或者跳转到一个默认页面
+							}
+							// 使用mui的方法或其他逻辑来跳转页面
+							mui.openWindow({
+								url: pageUrl,
+								id: 'main',
+								preload: true // 根据需要决定是否预加载
+							});
+						} else {
+							console.log('获取职业信息失败');
+							console.log('服务器返回的原始数据:', JSON.stringify(data), document.getElementById('account').value); // 将对象转换为字符串
 
-							var username = document.getElementById('account').value;
-							var password = document.getElementById('password').value;
+						}
+					})
 
-							var formData = new FormData();
-							formData.append('username', username);
-							formData.append('password', password);
-
-							fetch('https://ts.tuotuohome.asia/login.php', {
-								method: 'POST',
-								body: formData
-							})
-									.then(response => response.json())
-									.then(data => {
-										if (data.success) {
-											// 更新全局变量userOccupation
-											userOccupation = data.occupation;
-
-											// 使用更新后的全局变量来决定跳转
-											if (userOccupation === 'guard') {
-												window.location.href = 'guard_main.html';
-											} else if (userOccupation === 'rider') {
-												window.location.href = 'rider_main.html';
-											} else {
-												alert('登录成功，但未找到匹配的职业页面');
-											}
-										} else {
-											alert(data.message);
-										}
-									})
-									.catch(error => {
-										console.error('Error:', error);
-										alert('登录请求失败');
-									});
-						})
+					.catch(error => {
+						console.error('请求职业信息出错', error);
+						
+					});
 					};
 					//检查 "登录状态/锁屏状态" 开始
 					if (settings.autoLogin && state.token && settings.gestures) {
@@ -329,50 +380,7 @@
 				});
 			}(mui, document));
 		</script>
-    <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var loginForm = document.getElementById('login-form');
-    loginForm.addEventListener('submit', function(event) {
-        event.preventDefault();
 
-        var username = document.getElementById('account').value;
-        var password = document.getElementById('password').value;
-
-        var formData = new FormData();
-        formData.append('username', username);
-        formData.append('password', password);
-
-        fetch('https://ts.tuotuohome.asia/login.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // 更新全局变量userOccupation
-                userOccupation = data.occupation;
-
-                // 使用更新后的全局变量来决定跳转
-                if (userOccupation === 'guard') {
-                    window.location.href = 'guard_main.html';
-                } else if (userOccupation === 'rider') {
-                    window.location.href = 'rider_main.html';
-                } else {
-                    alert('登录成功，但未找到匹配的职业页面');
-                }
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('登录请求失败');
-        });
-    });
-});
-
-
-    </script>
 
 	</body>
 
