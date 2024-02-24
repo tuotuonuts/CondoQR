@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="ui-page-login">
+<html class="ui-page-login" xmlns="http://www.w3.org/1999/html">
 
 	<head>
 		<meta charset="utf-8">
@@ -10,15 +10,15 @@
 		<style>
 			.area {
 				margin: 20px auto 0px auto;
-				
+
 			}
 			.mui-input-group:first-child {
 				margin-top: 20px;
-				
+
 			}
 			.mui-input-group label {
 				width: 22%;
-				
+
 			}
 			.mui-input-row label~input,
 			.mui-input-row label~select,
@@ -28,19 +28,19 @@
 			.mui-checkbox input[type=checkbox],
 			.mui-radio input[type=radio] {
 				top: 6px;
-				
+
 			}
 			.mui-content-padded {
 				margin-top: 25px;
-				
+
 			}
 			.mui-btn {
 				padding: 10px;
-				
+
 			}
 			.mui-input-row label{
 				width: 24%;
-				
+
 			}
 			.mui-input-row div{
 				height: 20px;
@@ -50,14 +50,14 @@
 			#password_confirm,
 			#email{
 				width: 76%;
-				
+
 			}
 
 		.mui-input-row
 		input{
 			text-align: center;
 		}
-			
+
 		</style>
 	</head>
 
@@ -70,86 +70,218 @@
 			<form class="mui-input-group" style="height: 300px;">
 				<div class="mui-input-row" style="height: 50px;">
 					<label>Username</label>
-					<input id='account' type="text" class="mui-input-clear mui-input"  placeholder="Please enter your username">
+					<input id='account' name="username" type="text" class="mui-input-clear mui-input"  placeholder="Please enter your username">
 				</div>
 				<div class="mui-input-row" style="height: 50px;">
 					<label>Password</label>
-					<input id='password' type="password" class="mui-input-clear mui-input"  placeholder="Please enter your password">
+					<input id='password' name="password" type="password" class="mui-input-clear mui-input"  placeholder="Please enter your password">
 				</div>
 				<div class="mui-input-row" style="height: 50px;">
 					<label style="text-align: left;">Renter Password</label>
-					<input id='password_confirm' type="password" class="mui-input-clear mui-input"  placeholder="Please confirm your password">
+					<input id='password_confirm' name="password_confirm" type="password" class="mui-input-clear mui-input"  placeholder="Please confirm your password">
 				</div>
 				<div class="mui-input-row" style="height: 50px;">
 					<label>Phone</label>
-					<input id='account' type="text" class="mui-input-clear mui-input"  placeholder="Please enter your Phone number">
+					<input id='account' name="phone" type="number"  style="text-align: center" class="mui-input-clear mui-input"  placeholder="Please enter your Phone number">
 				</div>
 				<div class="mui-input-row" style="height: 50px;">
 					<label>ID</label>
-					<input id='account' type="text" class="mui-input-clear mui-input"  placeholder="Please enter your ID/Passport">
+					<input id='account' name="id" type="text" class="mui-input-clear mui-input"  placeholder="Please enter your ID/Passport">
 				</div>
 				<div class="mui-input-row" style="height: 50px;">
 					<label>Emali</label>
-					<input id='email' type="email" class="mui-input-clear mui-input"  placeholder="Please enter your e-mail address">
+					<input id='email' name="email" type="email" class="mui-input-clear mui-input"  placeholder="Please enter your e-mail address">
 				</div>
-			</form>
+
 			<div class="mui-content-padded">
-				<button id='reg' class="mui-btn mui-btn-block mui-btn-primary">Registrations</button>
+				<button id='reg'  class="mui-btn mui-btn-block mui-btn-primary">Registrations</button>
 			</div>
+			</form>
 			<div class="mui-content-padded">
 				<p>The registration is real and available, the registered user can be used to log in, but the sample program does not interact with the server, the user related data is only stored locally.</p>
 			</div>
 		</div>
-		<script src="js/mui.min.js"></script>
-		<script src="js/app.js"></script>
-		<script>
-			(function($, doc) {
-				$.init();
-				$.plusReady(function() {
-					var settings = app.getSettings();
-					var regButton = doc.getElementById('reg');
-					var accountBox = doc.getElementById('account');
-					var passwordBox = doc.getElementById('password');
-					var passwordConfirmBox = doc.getElementById('password_confirm');
-					var emailBox = doc.getElementById('email');
-					regButton.addEventListener('tap', function(event) {
-						var regInfo = {
-							account: accountBox.value,
-							password: passwordBox.value,
-							email: emailBox.value
-						};
-						var passwordConfirm = passwordConfirmBox.value;
-						if (passwordConfirm != regInfo.password) {
-							plus.nativeUI.toast('Inconsistency between two password entries');
-							return;
-						}
-						app.reg(regInfo, function(err) {
-							if (err) {
-								plus.nativeUI.toast(err);
-								return;
-							}
-							plus.nativeUI.toast('Successful registration');
-							/*
-							 * 注意：
-							 * 1、因本示例应用启动页就是登录页面，因此注册成功后，直接显示登录页即可；
-							 * 2、如果真实案例中，启动页不是登录页，则需修改，使用mui.openWindow打开真实的登录页面
-							 */
-							plus.webview.getLaunchWebview().show("pop-in",200,function () {
-								plus.webview.currentWebview().close("none");
-							});
-							//若启动页不是登录页，则需通过如下方式打开登录页
-//							$.openWindow({
-//								url: 'login.html',
-//								id: 'login',
-//								show: {
-//									aniShow: 'pop-in'
-//								}
-//							});
-						});
+<script src="js/mui.min.js"></script>
+<script src="js/app.js"></script>
+<script>
+    (function($, doc) {
+        $.init();
+        $.plusReady(function() {
+            // 清理表单数据的函数
+            function clearForm() {
+                doc.getElementById('account').value = '';
+                doc.getElementById('password').value = '';
+                doc.getElementById('password_confirm').value = '';
+                doc.getElementById('email').value = '';
+                // 如果还有其他表单元素，请在这里添加清空的逻辑
+            }
+
+            // 注册成功的处理逻辑
+            function handleRegistrationSuccess() {
+                // 清空表单
+                clearForm();
+                // 显示注册成功的消息，这里使用mui的toast方法
+                plus.nativeUI.toast('Registration successful');
+
+                // 关闭当前webview，返回到应用的启动页面
+                plus.webview.getLaunchWebview().show("pop-in", 200, function() {
+                    plus.webview.currentWebview().close("none");
+                });
+            }
+
+            // 获取注册按钮并添加事件监听
+            var regButton = doc.getElementById('reg');
+            regButton.addEventListener('tap', function(event) {
+                // 收集注册信息
+                var regInfo = {
+                    account: doc.getElementById('account').value,
+                    password: doc.getElementById('password').value,
+                    email: doc.getElementById('email').value
+                };
+                var passwordConfirm = doc.getElementById('password_confirm').value;
+                // 校验两次输入的密码是否一致
+                if (passwordConfirm != regInfo.password) {
+                    plus.nativeUI.toast('Inconsistency between two password entries');
+                    return;
+                }
+
+                // 这里调用app.reg进行注册，您需要替换为您的注册逻辑
+                app.reg(regInfo, function(err) {
+                    if (err) {
+                        plus.nativeUI.toast(err);
+                        return;
+                    }
+                    // 注册成功后的逻辑处理
+                    handleRegistrationSuccess();
+                });
+            });
+
+            // 如果有其他初始化逻辑，可以在这里添加
+        });
+    }(mui, document));
+</script>
+
+			<script>
+				// 等待 DOM 完全加载
+				document.addEventListener('DOMContentLoaded', function() {
+					// 监听表单的提交事件
+					document.getElementById('reg').addEventListener('click', function(event) {
+						event.preventDefault(); // 阻止表单的默认提交行为
+
+						// 创建 FormData 对象，收集表单数据
+						var formData = new FormData();
+						formData.append('username', document.querySelector('[name="username"]').value);
+						formData.append('password', document.querySelector('[name="password"]').value);
+						formData.append('password_confirm', document.querySelector('[name="password_confirm"]').value);
+						formData.append('phone', document.querySelector('[name="phone"]').value);
+						formData.append('id', document.querySelector('[name="id"]').value);
+						formData.append('email', document.querySelector('[name="email"]').value);
+
+						// 使用 fetch API 发送异步请求
+						fetch('https://ts.tuotuohome.asia/guard_reg.php', {
+							method: 'POST',
+							body: formData
+						})
+								.then(response => {
+									if (!response.ok) {
+										throw new Error('Network response was not ok');
+									}
+									return response.json(); // 假设服务器返回JSON格式的响应
+								})
+								.then(data => {
+									// 根据服务器响应的数据处理逻辑
+									if (data.success) {
+										console.log('Registration successful');
+										// 这里可以根据需要更新 UI，例如显示提交成功的消息
+									} else {
+										// 如果服务器返回错误信息，如用户名已存在
+										if(data.error === 'username_exists') {
+											plus.nativeUI.toast('Username already exists'); // 显示用户名已存在的错误提示
+										} else {
+											plus.nativeUI.toast('Registration failed: ' + data.message); // 显示其他错误信息
+										}
+									}
+								})
+								.catch(error => {
+									console.error('There was a problem with your fetch operation:', error);
+								});
 					});
 				});
-			}(mui, document));
-		</script>
+
+			</script>
+
+
+<!--		<script>-->
+<!--			(function($, doc) {-->
+<!--				$.init();-->
+<!--				$.plusReady(function() {-->
+<!--					var regButton = doc.getElementById('reg');-->
+<!--					regButton.addEventListener('click', function(event) {-->
+<!--						event.preventDefault(); // Prevent default form submission-->
+
+<!--						// Collect form data using the 'name' attribute-->
+<!--						var username = doc.querySelector('[name="username"]').value;-->
+<!--						var password = doc.querySelector('[name="password"]').value;-->
+<!--						var passwordConfirm = doc.querySelector('[name="password_confirm"]').value;-->
+<!--						var email = doc.querySelector('[name="email"]').value;-->
+<!--						var phone = doc.querySelector('[name="phone"]').value;-->
+<!--						var id = doc.querySelector('[name="id"]').value;-->
+
+<!--						// Basic validation-->
+<!--						if (!validateEmail(email)) {-->
+<!--							plus.nativeUI.toast('Invalid email format');-->
+<!--							return;-->
+<!--						}-->
+<!--						if (password !== passwordConfirm) {-->
+<!--							plus.nativeUI.toast('Passwords do not match');-->
+<!--							return;-->
+<!--						}-->
+<!--						if (!username || !password || !email || !phone || !id) {-->
+<!--							plus.nativeUI.toast('All fields are required');-->
+<!--							return;-->
+<!--						}-->
+
+<!--						// Prepare FormData-->
+<!--						var formData = new FormData();-->
+<!--						formData.append('username', username);-->
+<!--						formData.append('password', password);-->
+<!--						formData.append('email', email);-->
+<!--						formData.append('phone', phone);-->
+<!--						formData.append('id', id);-->
+
+<!--						// Send data to the server-->
+<!--						fetch('https://ts.tuotuohome.asia/guard_reg.php', {-->
+<!--							method: 'POST',-->
+<!--							body: formData-->
+<!--						})-->
+<!--								.then(response => response.json())-->
+<!--								.then(data => {-->
+<!--									if (data.success) {-->
+<!--										plus.nativeUI.toast('Registration successful');-->
+<!--										// Optional: Clear form or handle success-->
+<!--									} else if (data.error === 'username_exists') {-->
+<!--										plus.nativeUI.toast('Username already exists');-->
+<!--									} else {-->
+<!--										plus.nativeUI.toast('Registration failed: ' + (data.message || 'Unknown error'));-->
+<!--									}-->
+<!--								})-->
+<!--								.catch(error => {-->
+<!--									plus.nativeUI.toast('Registration failed: ' + error.message);-->
+<!--									console.error('Registration failed:', error);-->
+<!--								});-->
+<!--					});-->
+
+<!--					function validateEmail(email) {-->
+<!--						var pattern = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;-->
+<!--						return pattern.test(email);-->
+<!--					}-->
+<!--				});-->
+<!--			}(mui, document));-->
+<!--		</script>-->
+
+
+
+
 	</body>
 
 </html>
