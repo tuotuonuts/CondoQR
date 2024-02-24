@@ -70,27 +70,27 @@
 			<form class="mui-input-group" style="height: 300px;">
 				<div class="mui-input-row" style="height: 50px;">
 					<label>Username</label>
-					<input id='account' type="text" class="mui-input-clear mui-input"  placeholder="Please enter your username">
+					<input id='account' name = "username" type="text" class="mui-input-clear mui-input"  placeholder="Please enter your username">
 				</div>
 				<div class="mui-input-row" style="height: 50px;">
 					<label>Password</label>
-					<input id='password' type="password" class="mui-input-clear mui-input"  placeholder="Please enter your password">
+					<input id='password' name = "password" type="password" class="mui-input-clear mui-input"  placeholder="Please enter your password">
 				</div>
 				<div class="mui-input-row" style="height: 50px;">
 					<label style="text-align: left;">Renter Password</label>
-					<input id='password_confirm' type="password" class="mui-input-clear mui-input"  placeholder="Please confirm your password">
+					<input id='password_confirm'  name="password_confirm" type="password" class="mui-input-clear mui-input"  placeholder="Please confirm your password">
 				</div>
 				<div class="mui-input-row" style="height: 50px;">
 					<label>Phone</label>
-					<input id='account' type="text" class="mui-input-clear mui-input"  placeholder="Please enter your Phone number">
+					<input id='account' name = "phone" type="text" class="mui-input-clear mui-input"  placeholder="Please enter your Phone number">
 				</div>
 				<div class="mui-input-row" style="height: 50px;">
 					<label>ID</label>
-					<input id='account' type="text" class="mui-input-clear mui-input"  placeholder="Please enter your ID/Passport">
+					<input id='account' name = "id" type="text" class="mui-input-clear mui-input"  placeholder="Please enter your ID/Passport">
 				</div>
 				<div class="mui-input-row" style="height: 50px;">
 					<label>Emali</label>
-					<input id='email' type="email" class="mui-input-clear mui-input"  placeholder="Please enter your e-mail address">
+					<input id='email' name = "email" type="email" class="mui-input-clear mui-input"  placeholder="Please enter your e-mail address">
 				</div>
 			</form>
 			<div class="mui-content-padded">
@@ -149,6 +149,43 @@
 					});
 				});
 			}(mui, document));
+		</script>
+		<script>
+			// 等待 DOM 完全加载
+			document.addEventListener('DOMContentLoaded', function() {
+				// 监听表单的提交事件
+				document.getElementById('reg').addEventListener('click', function(event) {
+					event.preventDefault(); // 阻止表单的默认提交行为
+
+					// 创建 FormData 对象，收集表单数据
+					var formData = new FormData();
+					formData.append('username', document.querySelector('[name="username"]').value);
+					formData.append('password', document.querySelector('[name="password"]').value);
+					formData.append('password_confirm', document.querySelector('[name="password_confirm"]').value);
+					formData.append('phone', document.querySelector('[name="phone"]').value);
+					formData.append('id', document.querySelector('[name="id"]').value);
+					formData.append('email', document.querySelector('[name="email"]').value);
+
+					// 使用 fetch API 发送异步请求
+					fetch('http://ts.tuotuohome.asia/rider_reg.php', {
+						method: 'POST',
+						body: formData
+					})
+							.then(response => {
+								if (!response.ok) {
+									throw new Error('Network response was not ok');
+								}
+								return response.text(); // 或者 response.json()，如果服务器响应JSON
+							})
+							.then(data => {
+								console.log(data); // 处理服务器响应的数据
+								// 这里可以根据需要更新 UI，例如显示提交成功的消息
+							})
+							.catch(error => {
+								console.error('There was a problem with your fetch operation:', error);
+							});
+				});
+			});
 		</script>
 	</body>
 

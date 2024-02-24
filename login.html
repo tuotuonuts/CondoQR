@@ -125,53 +125,53 @@
 		<script src="js/mui.min.js"></script>
 		<script src="js/mui.enterfocus.js"></script>
 		<script src="js/app.js"></script>
-		<script>
-			var user_name;
-			document.addEventListener('DOMContentLoaded', function() {
-				var loginForm = document.getElementById('login-form');
-				loginForm.addEventListener('submit', function(event) {
-					event.preventDefault();
+
+<!-- 		<script>
+<!--			document.addEventListener('DOMContentLoaded', function() {-->
+<!--				var loginForm = document.getElementById('login-form');-->
+<!--				loginForm.addEventListener('submit', function(event) {-->
+<!--					event.preventDefault();-->
+<!--		-->
+<!--					var username = document.getElementById('account').value;-->
+<!--					var password = document.getElementById('password').value;-->
+<!--					-->
+<!--					var formData = new FormData();-->
+<!--					formData.append('username', username);-->
+<!--					formData.append('password', password);-->
+<!--		-->
+<!--					fetch('https://ts.tuotuohome.asia/login.php', {-->
+<!--						method: 'POST',-->
+<!--						body: formData-->
+<!--					})-->
+<!--					.then(response => response.json())-->
+<!--					.then(data => {-->
+<!--						if (data.success) {-->
+<!--							// 更新全局变量userOccupation-->
+<!--							userOccupation = data.occupation;-->
+<!--		-->
+<!--							// 使用更新后的全局变量来决定跳转-->
+<!--							if (userOccupation === 'guard') {-->
+<!--								window.location.href = 'guard_main.html';-->
+<!--							} else if (userOccupation === 'rider') {-->
+<!--								window.location.href = 'rider_main.html';-->
+<!--							} else {-->
+<!--								alert('登录成功，但未找到匹配的职业页面');-->
+<!--							}-->
+<!--						} else {-->
+<!--							alert(data.message);-->
+<!--						}-->
+<!--					})-->
+<!--					.catch(error => {-->
+<!--						console.error('Error:', error);-->
+<!--						alert('登录请求失败');-->
+<!--					});-->
+<!--					-->
+<!--				});-->
+<!--			-->
+<!--			});-->
 		
-					var username = document.getElementById('account').value;
-					window.user_name = document.getElementById('account').value;
-					var password = document.getElementById('password').value;
-					
-					var formData = new FormData();
-					formData.append('username', username);
-					formData.append('password', password);
 		
-					fetch('https://ts.tuotuohome.asia/login.php', {
-						method: 'POST',
-						body: formData
-					})
-					.then(response => response.json())
-					.then(data => {
-						if (data.success) {
-							// 更新全局变量userOccupation
-							userOccupation = data.occupation;
-		
-							// 使用更新后的全局变量来决定跳转
-							if (userOccupation === 'guard') {
-								window.location.href = 'guard_main.html';
-							} else if (userOccupation === 'rider') {
-								window.location.href = 'rider_main.html';
-							} else {
-								alert('登录成功，但未找到匹配的职业页面');
-							}
-						} else {
-							alert(data.message);
-						}
-					})
-					.catch(error => {
-						console.error('Error:', error);
-						alert('登录请求失败');
-					});
-					
-				});
-			});
-		
-		
-		</script>
+		</script> -->
 		<script>
 			(function($, doc) {
 				$.init({
@@ -197,6 +197,8 @@
 					.then(response => response.json())
 					.then(data => {
 						if(data.success) {
+							localStorage.setItem('user_name', document.getElementById('account').value);
+
 							// 根据职业信息决定跳转到哪个页面
 							var pageUrl = '';
 							switch(data.occupation) {
@@ -379,6 +381,9 @@
 					};
 				});
 			}(mui, document));
+		</script>
+		<script>
+
 		</script>
 
 

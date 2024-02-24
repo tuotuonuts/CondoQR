@@ -53,6 +53,12 @@
 		<script src="js/mui.min.js"></script>
 		<script src="js/app.js"></script>
 		<script>
+			var username = localStorage.getItem('user_name');
+			document.getElementById('account').textContent = username;
+			alert("Hello " + username + "!");
+			console.log("Hello", username,"!");
+		</script>
+		<script>
 			(function($, doc) {
 				$.init();
 				var settings = app.getSettings();

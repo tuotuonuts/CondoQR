@@ -31,22 +31,25 @@
 				</p>
 				
 <div class="wrapper">
-      <header>
-        <h1>QR Code Generator</h1>
-        <p>Paste a url or enter text to create QR code</p>
-      </header>
-      <div class="form">
-        <input type="text" spellcheck="false" placeholder="Enter text or url">
-        <button>Generate QR Code</button>
-      </div>
+
 	  <div class="mui-content-padded">
-	  	<a href="scan.html">
-	  	<button id='rider' class="mui-btn mui-btn-block mui-btn-primary">scan</button>
+	  	<a href="location.html">
+	  	<button  class="mui-btn mui-btn-block mui-btn-primary">Change Condo Name</button>
 	  	</a>
 	  </div>
-      <div class="qr-code">
-        <img src="" alt="qr-code">
-      </div>
+
+	  <div class="mui-content-padded">
+	  	<a href="scan.html">
+	  	<button  class="mui-btn mui-btn-block mui-btn-primary">scan</button>
+	  	</a>
+	  </div>
+	  
+	  <div class="mui-content-padded">
+	  	<a href="records.html">
+	  	<button  class="mui-btn mui-btn-block mui-btn-primary">Access records</button>
+	  	</a>
+	  </div>
+
     </div>
 				<!--<button  class="mui-btn mui-btn-block mui-btn-primary">Setting</button>-->
 				<!--
@@ -57,6 +60,12 @@
 		</div>
 		<script src="js/mui.min.js"></script>
 		<script src="js/app.js"></script>
+	<script>
+		var username = localStorage.getItem('user_name');
+		document.getElementById('account').textContent = username;
+		alert("Hello " + username + "!");
+		console.log("Hello", username,"!");
+	</script>
 		<script>
 			(function($, doc) {
 				$.init();
@@ -131,6 +140,8 @@
 			    }
 			});
 		</script>
+
+
 	</body>
 
 </html>

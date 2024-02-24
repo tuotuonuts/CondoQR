@@ -108,6 +108,7 @@
                 config,
                 (decodedText, decodedResult) => {
                     alert(`扫码结果: ${decodedText}`);
+                    window.location.replace("guard_main.html");
                     html5QrCode.stop().then(() => {
                         console.log("扫描已停止");
                     }).catch(err => {

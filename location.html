@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html class="ui-page-login">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/style.css" rel="stylesheet" />
+		<style>
+			.area {
+				margin: 20px auto 0px auto;
+			}
+			.mui-input-group:first-child {
+				margin-top: 20px;
+			}
+			.mui-input-group label {
+				width: 22%;
+			}
+			.mui-input-row label~input,
+			.mui-input-row label~select,
+			.mui-input-row label~textarea {
+				width: 78%;
+			}
+			.mui-checkbox input[type=checkbox],
+			.mui-radio input[type=radio] {
+				top: 6px;
+			}
+			.mui-content-padded {
+				margin-top: 25px;
+			}
+			.mui-btn {
+				padding: 10px;
+			}
+			.mui-input-row label~input, .mui-input-row label~select, .mui-input-row label~textarea{
+				margin-top: 1px;
+			}
+			.mui-btn-primary{
+				background-color: #ffa52a;
+				border-style: none;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">Set Condo Name</h1>
+		</header>
+		<div class="mui-content">
+			
+		<form id="updateForm">
+		  New Address:<br>
+		  <input type="text" id="address" name="address">
+		  <br><br>
+		  <input type="button" value="Update Address" onclick="updateAddress()">
+		</form> 
+
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/app.js"></script>
+			<script>
+			function updateAddress() {
+			  const address = document.getElementById('address').value;
+			  // 直接从localStorage获取username
+			  const username = localStorage.getItem('user_name');
+			  
+			  console.log(username);
+			  
+			  // 将用户名和地址发送到后端API
+			  fetch('https://ts.tuotuohome.asia/location.php', {
+				method: 'POST',
+				headers: {
+				  'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ username, address }),
+			  })
+			  .then(response => {
+				// 首先检查响应是否成功
+				if (!response.ok) {
+				  throw new Error(`HTTP error! status: ${response.status}`);
+				}
+				return response.text(); // 先获取响应文本
+			  })
+			  .then(text => {
+				try {
+				  const data = JSON.parse(text); // 尝试解析为JSON
+				  console.log('Success:', data);
+				  alert('Address updated successfully!');
+				  window.location.replace("guard_main.html");
+				} catch (error) {
+				  // 如果JSON解析失败
+				  console.error('Error parsing JSON:', error);
+				  console.error('Received text:', text); // 显示原始文本以便调试
+				}
+			  })
+			  .catch((error) => {
+				console.error('Fetch error:', error);
+			  });
+			}
+
+			</script>
+	</body>
+
+</html>
