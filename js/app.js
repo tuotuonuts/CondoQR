@@ -13,10 +13,10 @@
 		loginInfo.account = loginInfo.account || '';
 		loginInfo.password = loginInfo.password || '';
 		if (loginInfo.account.length < 5) {
-			return callback('账号最短为 5 个字符');
+			return callback('Minimum user name is 5 characters');
 		}
 		if (loginInfo.password.length < 6) {
-			return callback('密码最短为 6 个字符');
+			return callback('Minimum password of 6 characters');
 		}
 		var users = JSON.parse(localStorage.getItem('$users') || '[]');
 		var authed = users.some(function(user) {
@@ -25,7 +25,7 @@
 		if (authed) {
 			return owner.createState(loginInfo.account, callback);
 		} else {
-			return callback('用户名或密码错误');
+			return callback('Incorrect user name or password');
 		}
 	};
 
@@ -46,10 +46,10 @@
 		regInfo.account = regInfo.account || '';
 		regInfo.password = regInfo.password || '';
 		if (regInfo.account.length < 5) {
-			return callback('用户名最短需要 5 个字符');
+			return callback('Minimum 5 characters required for username');
 		}
 		if (regInfo.password.length < 6) {
-			return callback('密码最短需要 6 个字符');
+			return callback('Minimum 6 characters required for password');
 		}
 		// if (!checkEmail(regInfo.email)) {
 		// 	return callback('邮箱地址不合法');
@@ -92,7 +92,7 @@
 		if (!checkEmail(email)) {
 			return callback('邮箱地址不合法');
 		}
-		return callback(null, '新的随机密码已经发送到您的邮箱，请查收邮件。');
+		return callback(null, 'A new randomized password has been sent to your email address, please check your email.');
 	};
 
 	/**

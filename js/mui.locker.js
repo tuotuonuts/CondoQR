@@ -53,7 +53,7 @@
 		init: function(holder, options) {
 			var self = this;
 			if (!holder) {
-				throw "构造 Locker 时缺少容器元素";
+				throw "Missing container element when constructing 'Locker'.";
 			}
 			self.holder = holder;
 			//避免重复初始化开始

@@ -126,52 +126,52 @@
 		<script src="js/mui.enterfocus.js"></script>
 		<script src="js/app.js"></script>
 
-		<script>
-			document.addEventListener('DOMContentLoaded', function() {
-				var loginForm = document.getElementById('login-form');
-				loginForm.addEventListener('submit', function(event) {
-					event.preventDefault();
+<!-- 		<script>
+<!--			document.addEventListener('DOMContentLoaded', function() {-->
+<!--				var loginForm = document.getElementById('login-form');-->
+<!--				loginForm.addEventListener('submit', function(event) {-->
+<!--					event.preventDefault();-->
+<!--		-->
+<!--					var username = document.getElementById('account').value;-->
+<!--					var password = document.getElementById('password').value;-->
+<!--					-->
+<!--					var formData = new FormData();-->
+<!--					formData.append('username', username);-->
+<!--					formData.append('password', password);-->
+<!--		-->
+<!--					fetch('https://ts.tuotuohome.asia/login.php', {-->
+<!--						method: 'POST',-->
+<!--						body: formData-->
+<!--					})-->
+<!--					.then(response => response.json())-->
+<!--					.then(data => {-->
+<!--						if (data.success) {-->
+<!--							// 更新全局变量userOccupation-->
+<!--							userOccupation = data.occupation;-->
+<!--		-->
+<!--							// 使用更新后的全局变量来决定跳转-->
+<!--							if (userOccupation === 'guard') {-->
+<!--								window.location.href = 'guard_main.html';-->
+<!--							} else if (userOccupation === 'rider') {-->
+<!--								window.location.href = 'rider_main.html';-->
+<!--							} else {-->
+<!--								alert('登录成功，但未找到匹配的职业页面');-->
+<!--							}-->
+<!--						} else {-->
+<!--							alert(data.message);-->
+<!--						}-->
+<!--					})-->
+<!--					.catch(error => {-->
+<!--						console.error('Error:', error);-->
+<!--						alert('登录请求失败');-->
+<!--					});-->
+<!--					-->
+<!--				});-->
+<!--			-->
+<!--			});-->
 		
-					var username = document.getElementById('account').value;
-					var password = document.getElementById('password').value;
-					
-					var formData = new FormData();
-					formData.append('username', username);
-					formData.append('password', password);
 		
-					fetch('https://ts.tuotuohome.asia/login.php', {
-						method: 'POST',
-						body: formData
-					})
-					.then(response => response.json())
-					.then(data => {
-						if (data.success) {
-							// 更新全局变量userOccupation
-							userOccupation = data.occupation;
-		
-							// 使用更新后的全局变量来决定跳转
-							if (userOccupation === 'guard') {
-								window.location.href = 'guard_main.html';
-							} else if (userOccupation === 'rider') {
-								window.location.href = 'rider_main.html';
-							} else {
-								alert('登录成功，但未找到匹配的职业页面');
-							}
-						} else {
-							alert(data.message);
-						}
-					})
-					.catch(error => {
-						console.error('Error:', error);
-						alert('登录请求失败');
-					});
-					
-				});
-			
-			});
-		
-		
-		</script>
+		</script> -->
 		<script>
 			(function($, doc) {
 				$.init({
@@ -266,31 +266,31 @@
 							}
 							$(oauthArea).on('tap', '.oauth-btn', function() {
 								if (this.classList.contains('disabled')) {
-									plus.nativeUI.toast('您尚未安装微信客户端');
+									plus.nativeUI.toast('You have not installed the client');
 									return;
 								}
 								var auth = auths[this.authId];
 								var waiting = plus.nativeUI.showWaiting();
 								auth.login(function() {
 									waiting.close();
-									plus.nativeUI.toast("登录认证成功");
+									plus.nativeUI.toast("Login Authentication Successful");
 									auth.getUserInfo(function() {
-										plus.nativeUI.toast("获取用户信息成功");
+										plus.nativeUI.toast("Get user information successfully");
 										var name = auth.userInfo.nickname || auth.userInfo.name;
 										app.createState(name, function() {
 											toMain();
 										});
 									}, function(e) {
-										plus.nativeUI.toast("获取用户信息失败：" + e.message);
+										plus.nativeUI.toast("Failed to get user information:" + e.message);
 									});
 								}, function(e) {
 									waiting.close();
-									plus.nativeUI.toast("登录认证失败：" + e.message);
+									plus.nativeUI.toast("Login authentication failed:" + e.message);
 								});
 							});
 						}, function(e) {
 							oauthArea.style.display = 'none';
-							plus.nativeUI.toast("获取登录认证失败：" + e.message);
+							plus.nativeUI.toast("Failed to get login authentication:" + e.message);
 						});
 					}
 					// close splash
@@ -372,7 +372,7 @@
 						if (backButtonPress > 1) {
 							plus.runtime.quit();
 						} else {
-							plus.nativeUI.toast('再按一次退出应用');
+							plus.nativeUI.toast('Press again to exit the application');
 						}
 						setTimeout(function() {
 							backButtonPress = 0;

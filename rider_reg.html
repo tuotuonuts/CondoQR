@@ -67,7 +67,7 @@
 			<h1 class="mui-title">Rider Registration</h1>
 		</header>
 		<div class="mui-content">
-			<form class="mui-input-group" style="height: 300px;">
+			<form class="mui-input-group" style="height: 400px;">
 				<div class="mui-input-row" style="height: 50px;">
 					<label>Username</label>
 					<input id='account' name = "username" type="text" class="mui-input-clear mui-input"  placeholder="Please enter your username">
@@ -83,6 +83,14 @@
 				<div class="mui-input-row" style="height: 50px;">
 					<label>Phone</label>
 					<input id='account' name = "phone" type="text" class="mui-input-clear mui-input"  placeholder="Please enter your Phone number">
+				</div>
+				<div class="mui-input-row" style="height: 50px;">
+					<label>Firstname</label>
+					<input id='account' name = "Firstname" type="text" class="mui-input-clear mui-input"  placeholder="Please enter your firstname">
+				</div>
+				<div class="mui-input-row" style="height: 50px;">
+					<label>Lastname</label>
+					<input id='account' name = "Lastname" type="text" class="mui-input-clear mui-input"  placeholder="Please enter your lastname">
 				</div>
 				<div class="mui-input-row" style="height: 50px;">
 					<label>ID</label>
@@ -151,41 +159,44 @@
 			}(mui, document));
 		</script>
 		<script>
-			// 等待 DOM 完全加载
-			document.addEventListener('DOMContentLoaded', function() {
-				// 监听表单的提交事件
-				document.getElementById('reg').addEventListener('click', function(event) {
-					event.preventDefault(); // 阻止表单的默认提交行为
-
-					// 创建 FormData 对象，收集表单数据
-					var formData = new FormData();
-					formData.append('username', document.querySelector('[name="username"]').value);
-					formData.append('password', document.querySelector('[name="password"]').value);
-					formData.append('password_confirm', document.querySelector('[name="password_confirm"]').value);
-					formData.append('phone', document.querySelector('[name="phone"]').value);
-					formData.append('id', document.querySelector('[name="id"]').value);
-					formData.append('email', document.querySelector('[name="email"]').value);
-
-					// 使用 fetch API 发送异步请求
-					fetch('https://ts.tuotuohome.asia/rider_reg.php', {
-						method: 'POST',
-						body: formData
-					})
-							.then(response => {
-								if (!response.ok) {
-									throw new Error('Network response was not ok');
-								}
-								return response.text(); // 或者 response.json()，如果服务器响应JSON
-							})
-							.then(data => {
-								console.log(data); // 处理服务器响应的数据
-								// 这里可以根据需要更新 UI，例如显示提交成功的消息
-							})
-							.catch(error => {
-								console.error('There was a problem with your fetch operation:', error);
-							});
-				});
-			});
+		    // 等待 DOM 完全加载
+		    document.addEventListener('DOMContentLoaded', function() {
+		        // 监听表单的提交事件
+		        document.getElementById('reg').addEventListener('click', function(event) {
+		            event.preventDefault(); // 阻止表单的默认提交行为
+		
+		            // 创建 FormData 对象，收集表单数据
+		            var formData = new FormData();
+		            formData.append('username', document.querySelector('[name="username"]').value);
+		            formData.append('password', document.querySelector('[name="password"]').value);
+		            formData.append('password_confirm', document.querySelector('[name="password_confirm"]').value);
+		            formData.append('phone', document.querySelector('[name="phone"]').value);
+		            formData.append('id', document.querySelector('[name="id"]').value);
+		            formData.append('email', document.querySelector('[name="email"]').value);
+		            // 收集 Firstname 和 Lastname 字段
+		            formData.append('firstname', document.querySelector('[name="Firstname"]').value); // 确保与表单中的 name 属性匹配
+		            formData.append('lastname', document.querySelector('[name="Lastname"]').value); // 确保与表单中的 name 属性匹配
+		
+		            // 使用 fetch API 发送异步请求
+		            fetch('https://ts.tuotuohome.asia/rider_reg.php', {
+		                method: 'POST',
+		                body: formData
+		            })
+		            .then(response => {
+		                if (!response.ok) {
+		                    throw new Error('Network response was not ok');
+		                }
+		                return response.text(); // 或者 response.json()，如果服务器响应JSON
+		            })
+		            .then(data => {
+		                console.log(data); // 处理服务器响应的数据
+		                // 这里可以根据需要更新 UI，例如显示提交成功的消息
+		            })
+		            .catch(error => {
+		                console.error('There was a problem with your fetch operation:', error);
+		            });
+		        });
+		    });
 		</script>
 	</body>
 

@@ -75,9 +75,9 @@
 	feedback.send = function(content, callback) {
 		feedback.login(function(user, conn) {
 			//发送文本消息
-			var msgText = '问题:' + content.question;
+			var msgText = 'Question:' + content.question;
 			if (content.contact) {
-				msgText += '; 联系方式:' + content.contact + ';'
+				msgText += '; Contact details:' + content.contact + ';'
 			}
 			conn.sendTextMessage({
 				to: CUSTOM_ID,

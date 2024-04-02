@@ -62,7 +62,7 @@
         <div class="center">
             <select id="cameraSelect"></select>
         </div>
-        <button id="startButton" class="mui-btn mui-btn-block mui-btn-primary">开始扫码</button>
+        <button id="startButton" class="mui-btn mui-btn-block mui-btn-primary">Scan QR Code</button>
         <div id="reader"></div>
     </div>
 </div>
@@ -70,57 +70,106 @@
 <script src="js/app.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const cameraSelect = document.getElementById("cameraSelect");
-        const startButton = document.getElementById("startButton");
-        let html5QrCode;
+document.addEventListener('DOMContentLoaded', () => {
+    var guard_username = localStorage.getItem('user_name'); // Assuming this is how you get the current user's name
+    const cameraSelect = document.getElementById("cameraSelect");
+    const startButton = document.getElementById("startButton");
+    let html5QrCode;
 
-        Html5Qrcode.getCameras().then(cameras => {
-            cameras.forEach((camera, index) => {
-                const option = document.createElement("option");
-                option.value = camera.id;
-                option.text = camera.label || `摄像头 ${index}`;
-                cameraSelect.appendChild(option);
-            });
+    Html5Qrcode.getCameras().then(cameras => {
+        cameras.forEach((camera, index) => {
+            const option = document.createElement("option");
+            option.value = camera.id;
+            option.text = camera.label || `Camera ${index}`;
+            cameraSelect.appendChild(option);
         });
+    });
 
-        startButton.addEventListener('click', () => {
-            const selectedCameraId = cameraSelect.value;
-            if (!selectedCameraId) {
-                alert("请选择一个摄像头");
-                return;
-            }
+function startScan(cameraId) {
+    html5QrCode = new Html5Qrcode("reader");
+    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+    html5QrCode.start(
+        cameraId,
+        config,
+        (decodedText, decodedResult) => {
+            // Assuming QR code data is in the format: "CondoQR,rider_username,timestamp"
+            const dataParts = decodedText.split(',');
+            if (dataParts[0] === "CondoQR" && dataParts.length === 3) {
+                const rider_username = dataParts[1];
+                const QRtime = dataParts[2]; // This is the timestamp from the QR code
+                const scanTime = Math.floor(Date.now() / 1000); // Current timestamp in seconds
 
-            if (html5QrCode) {
+                // Stop the QR code scanner before sending data to prevent multiple scans
                 html5QrCode.stop().then(() => {
-                    startScan(selectedCameraId);
+                    console.log("QR code scanning stopped.");
+                    // Sending both QR time and scan time along with other data to the server
+                    sendDataToDatabase(rider_username, QRtime, scanTime, guard_username, "Example Location");
+                }).catch(err => {
+                    console.error("Failed to stop QR code scanning:", err);
                 });
             } else {
-                startScan(selectedCameraId);
+                alert("Failed to scan QR code: Invalid format");
             }
-        });
+        },
+        (errorMessage) => {
+            console.error(errorMessage);
+        }
+    ).catch(err => console.error(`Failed to start QR code scanning: ${err}`));
+}
 
-        function startScan(cameraId) {
-            html5QrCode = new Html5Qrcode("reader");
-            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-            html5QrCode.start(
-                cameraId,
-                config,
-                (decodedText, decodedResult) => {
-                    alert(`扫码结果: ${decodedText}`);
-                    html5QrCode.stop().then(() => {
-                        console.log("扫描已停止");
-                    }).catch(err => {
-                        console.error(`停止扫描时发生错误: ${err}`);
-                    });
-                },
-                (errorMessage) => {
-                    console.error(errorMessage);
-                }
-            ).catch(err => console.error(`启动二维码扫描失败: ${err}`));
+
+    startButton.addEventListener('click', () => {
+        const selectedCameraId = cameraSelect.value;
+        if (html5QrCode) {
+            html5QrCode.stop().then(() => {
+                startScan(selectedCameraId);
+            }).catch(err => {
+                console.error("Error stopping the QR scanner", err);
+                startScan(selectedCameraId);
+            });
+        } else {
+            startScan(selectedCameraId);
         }
     });
+
+function sendDataToDatabase(username, QRtime, scanTime, guard_username, scannerLocation) {
+    // Prepare data to be sent to the server
+    const dataToSend = {
+        rider_username: username,
+        QRtime: QRtime, // Time from the QR code
+        scanTime: scanTime, // Current time when the QR code was scanned
+        guard_username: guard_username,
+        scannerLocation: scannerLocation,
+    };
+
+    // Example of sending the prepared data to a server-side script
+    fetch('https://ts.tuotuohome.asia/submitQRData.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("QR code scanned successfully!");
+			window.location.replace("guard_main.html");
+        } else {
+            alert("Failed to submit data: " + data.message);
+        }
+    })
+    .catch((error) => {
+        alert("Failed to scan QR code. Error: " + error);
+        console.error("Error:", error);
+    });
+}
+
+});
 </script>
+
+
+
 </body>
 
 </html>

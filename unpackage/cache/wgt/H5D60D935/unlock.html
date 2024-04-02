@@ -94,7 +94,7 @@
 							tryNumber--;
 							rs.sender.clear();
 							if (tryNumber > 0) {
-								plus.nativeUI.toast('解锁手势错误，还能尝试 ' + tryNumber + ' 次。');
+								plus.nativeUI.toast('Unlock gesture error ' + tryNumber + ' more tries.');
 							} else {
 								clearStateAndToLogin();
 							}
@@ -106,7 +106,7 @@
 						if (backButtonPress > 1) {
 							plus.runtime.quit();
 						} else {
-							plus.nativeUI.toast('再按一次退出应用');
+							plus.nativeUI.toast('Press again to exit the application');
 						}
 						setTimeout(function() {
 							backButtonPress = 0;

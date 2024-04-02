@@ -82,7 +82,7 @@
 		if (ui.question.value == '' ||
 			(ui.contact.value != '' &&
 				ui.contact.value.search(/^(\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+)|([1-9]\d{4,9})$/) != 0)) {
-			return mui.toast('信息填写不符合规范');
+			return mui.toast('The information is not filled out in accordance with the specifications');
 		} 
 		plus.nativeUI.showWaiting();
 		feedback.send({
@@ -91,7 +91,7 @@
 			images: ui.getFileInputIdArray()
 		}, function() {
 			plus.nativeUI.closeWaiting();
-			mui.toast('感谢您的建议~');
+			mui.toast('Thank you for your advice.');
 			ui.clearForm();
 			mui.back();
 		});
