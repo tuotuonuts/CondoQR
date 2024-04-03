@@ -48,58 +48,91 @@
 			<h1 class="mui-title">Set Condo Name</h1>
 		</header>
 		<div class="mui-content">
-			
+		<p id="currentAddress">Current Address: <span id="currentAddressValue">Loading...</span></p>
 		<form id="updateForm">
-		  New Address:<br>
-		  <input type="text" id="address" name="address">
-		  <br><br>
-		  <input type="button" value="Update Address" onclick="updateAddress()">
-		</form> 
+		    New Address:<br>
+		    <input type="text" id="address" name="address">
+		    <br>
+		    <div class="mui-content-padded">
+		        <button type="submit" class="mui-btn mui-btn-block mui-btn-primary">Update Address</button>
+		    </div>
+		</form>
 
 		</div>
 		<script src="js/mui.min.js"></script>
 		<script src="js/app.js"></script>
-			<script>
-			function updateAddress() {
-			  const address = document.getElementById('address').value;
-			  // 直接从localStorage获取username
-			  const username = localStorage.getItem('user_name');
-			  
-			  console.log(username);
-			  
-			  // 将用户名和地址发送到后端API
-			  fetch('https://ts.tuotuohome.asia/location.php', {
+		<script>
+		// 页面加载完成后，添加 submit 事件监听器而不是 onclick
+		document.addEventListener('DOMContentLoaded', function() {
+		    const username = localStorage.getItem('user_name');
+		    getCurrentAddress(username);
+		
+		    document.getElementById('updateForm').addEventListener('submit', function(event) {
+		        event.preventDefault(); // 阻止表单的默认提交行为
+		        updateAddress();
+		    });
+		});
+
+		// 定义获取当前地址的函数
+		function getCurrentAddress(username) {
+			fetch('https://ts.tuotuohome.asia/getGuardLocation.php', {
 				method: 'POST',
 				headers: {
-				  'Content-Type': 'application/json',
+					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ username, address }),
-			  })
-			  .then(response => {
-				// 首先检查响应是否成功
-				if (!response.ok) {
-				  throw new Error(`HTTP error! status: ${response.status}`);
+				body: JSON.stringify({ username: username }),
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					// 如果成功获取到地址，则显示在页面上
+					document.getElementById('currentAddressValue').textContent = data.location;
+				} else {
+					// 如果获取地址失败，则显示错误信息
+					document.getElementById('currentAddressValue').textContent = 'Address not available';
 				}
-				return response.text(); // 先获取响应文本
-			  })
-			  .then(text => {
-				try {
-				  const data = JSON.parse(text); // 尝试解析为JSON
-				  console.log('Success:', data);
-				  alert('Address updated successfully!');
-				  window.location.replace("guard_main.html");
-				} catch (error) {
-				  // 如果JSON解析失败
-				  console.error('Error parsing JSON:', error);
-				  console.error('Received text:', text); // 显示原始文本以便调试
-				}
-			  })
-			  .catch((error) => {
-				console.error('Fetch error:', error);
-			  });
-			}
+			})
+			.catch((error) => {
+				console.error('Error fetching current address:', error);
+				document.getElementById('currentAddressValue').textContent = 'Error fetching address';
+			});
+		}
 
-			</script>
+		// 定义更新地址的函数
+		function updateAddress() {
+			const address = document.getElementById('address').value;
+			const username = localStorage.getItem('user_name');
+
+			fetch('https://ts.tuotuohome.asia/location.php', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ username: username, address: address }),
+			})
+			.then(response => {
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+				return response.text();
+			})
+			.then(text => {
+				try {
+					const data = JSON.parse(text);
+					alert('Address updated successfully!');
+					window.location.replace("guard_main.html");
+				} catch (error) {
+					console.error('Error parsing JSON:', error);
+					alert('Failed to update address.');
+				}
+			})
+			.catch((error) => {
+				console.error('Fetch error:', error);
+				alert('Failed to update address.');
+			});
+		}
+		</script>
+
 	</body>
 
 </html>

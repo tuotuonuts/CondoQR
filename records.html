@@ -59,6 +59,7 @@
 		<header class="mui-bar mui-bar-nav">
 			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
 			<h1 class="mui-title">Personnel access records</h1>
+			<button id='setting' class=" mui-pull-right mui-btn-link">Refresh</button>
 		</header>
 		<div class="mui-content">
 			
@@ -94,35 +95,53 @@
 		<script src="js/app.js"></script>
 		<script>
 		  // 假设其他代码保持不变，只修改fetchRiderRecords函数
-		var testun = "abcabc";
-		  function fetchRiderRecords() {
-			var username = localStorage.getItem('user_name'); // 获取用户名
-			// 使用提供的URL并附加用户名作为查询参数
-			fetch(`https://ts.tuotuohome.asia/getRiderRecords.php?rider=${testun}`)
-			  .then(response => response.json())
-			  .then(data => {
-				const tableBody = document.getElementById('recordsTable').getElementsByTagName('tbody')[0];
-				tableBody.innerHTML = ''; // 清空之前的结果
-				data.forEach(record => {
-				  const row = `<tr>
-								<td>${record.id}</td>
-								<td>${record.rider}</td>
-								<td>${record.QRtime}</td>
-								<td>${record.address}</td>
-								<td>${record.guard}</td>
-								<td>${record.scanTime}</td>
-							   </tr>`;
-				  tableBody.innerHTML += row;
-				});
-			  })
-			  .catch(error => console.error('Error fetching data:', error));
-		  }
+		var testun = "qweqwe";
+		function fetchRiderRecords() {
+		    var username = localStorage.getItem('user_name'); // 获取用户名
+		    // 使用提供的URL并附加用户名作为查询参数
+		    fetch(`https://ts.tuotuohome.asia/getRiderRecords.php?rider=${testun}`)
+		      .then(response => response.json())
+		      .then(data => {
+		        const tableBody = document.getElementById('recordsTable').getElementsByTagName('tbody')[0];
+		        tableBody.innerHTML = ''; // 清空之前的结果
+		
+		        // 初始化行号计数器
+		        let rowNumber = 1;
+		
+		        data.forEach(record => {
+		          // 转换时间戳为北京时间
+		          let qrTime = new Date(record.QRtime).toLocaleString("zh-CN", {timeZone: "Asia/Shanghai"});
+		          let scanTime = new Date(record.scanTime * 1000).toLocaleString("zh-CN", {timeZone: "Asia/Shanghai"});
+		
+		          // 使用 rowNumber 作为表格中的行号
+		          const row = `<tr>
+		                        <td>${rowNumber++}</td> <!-- 使用并增加行号 -->
+		                        <td>${record.rider}</td>
+		                        <td>${qrTime}</td>
+		                        <td>${record.address}</td>
+		                        <td>${record.guard}</td>
+		                        <td>${scanTime}</td>
+		                       </tr>`;
+		
+		          tableBody.innerHTML += row;
+		        });
+		      })
+		      .catch(error => console.error('Error fetching data:', error));
+		}
+
+
 
 		  // 假设在某个地方调用fetchRiderRecords函数，例如：
 		  // 在页面加载完成后自动获取记录，或者绑定到某个按钮的点击事件
-		  document.addEventListener('DOMContentLoaded', function() {
-			fetchRiderRecords(); // 可以直接调用，因为它现在不需要输入值
-		  });
+			// DOMContentLoaded 事件监听器以及刷新按钮的点击事件处理
+				document.addEventListener('DOMContentLoaded', function() {
+					fetchRiderRecords(); // 页面加载完成后自动获取记录
+
+					var refreshButton = document.getElementById('setting'); // 获取刷新按钮
+					refreshButton.addEventListener('click', function() {
+						fetchRiderRecords(); // 当按钮被点击时，再次调用 fetchRiderRecords 函数
+					});
+				});
 		</script>
 
 

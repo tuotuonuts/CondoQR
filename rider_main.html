@@ -15,6 +15,12 @@
 			.mui-btn {
 				padding: 10px;
 			}
+			.qr-code img {
+			    display: none; /* 初始不显示图片 */
+			    margin: 0 auto; /* 居中图片 */
+			    display: block; /* 当显示时，使用块级元素以允许居中对齐 */
+			}
+
 		</style>
 	</head>
 
@@ -31,22 +37,22 @@
 				</p>
 				
 <div class="wrapper">
-      <header>
-        <h1>QR Code Generator</h1>
-        <p>Paste a url or enter text to create QR code</p>
-      </header>
-      <div class="form">
-        <input type="text" spellcheck="false" placeholder="Enter text or url">
-        <button>Generate QR Code</button>
-      </div>
-      <div class="qr-code">
-        <img src="" alt="qr-code">
-      </div>
 	  <div class="mui-content-padded">
 	  	<a href="records.html">
-	  	<button  class="mui-btn mui-btn-block mui-btn-primary">Access records</button>
+	  	<button class="mui-btn mui-btn-block mui-btn-primary">Access records</button>
 	  	</a>
 	  </div>
+      <div class="form">
+		<div class="mui-content-padded">
+        <button class="mui-btn mui-btn-block mui-btn-primary">Generate QR Code</button>
+		</div>
+      </div>
+	  <br><br>
+	  <br><br>
+      <div class="qr-code"">
+        <img src="">
+      </div>
+
     </div>
 				<!--<button  class="mui-btn mui-btn-block mui-btn-primary">Setting</button>-->
 				<!--
