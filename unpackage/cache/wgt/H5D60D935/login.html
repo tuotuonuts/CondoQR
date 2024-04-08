@@ -125,266 +125,210 @@
 		<script src="js/mui.min.js"></script>
 		<script src="js/mui.enterfocus.js"></script>
 		<script src="js/app.js"></script>
-
-<!-- 		<script>
-<!--			document.addEventListener('DOMContentLoaded', function() {-->
-<!--				var loginForm = document.getElementById('login-form');-->
-<!--				loginForm.addEventListener('submit', function(event) {-->
-<!--					event.preventDefault();-->
-<!--		-->
-<!--					var username = document.getElementById('account').value;-->
-<!--					var password = document.getElementById('password').value;-->
-<!--					-->
-<!--					var formData = new FormData();-->
-<!--					formData.append('username', username);-->
-<!--					formData.append('password', password);-->
-<!--		-->
-<!--					fetch('https://ts.tuotuohome.asia/login.php', {-->
-<!--						method: 'POST',-->
-<!--						body: formData-->
-<!--					})-->
-<!--					.then(response => response.json())-->
-<!--					.then(data => {-->
-<!--						if (data.success) {-->
-<!--							// 更新全局变量userOccupation-->
-<!--							userOccupation = data.occupation;-->
-<!--		-->
-<!--							// 使用更新后的全局变量来决定跳转-->
-<!--							if (userOccupation === 'guard') {-->
-<!--								window.location.href = 'guard_main.html';-->
-<!--							} else if (userOccupation === 'rider') {-->
-<!--								window.location.href = 'rider_main.html';-->
-<!--							} else {-->
-<!--								alert('登录成功，但未找到匹配的职业页面');-->
-<!--							}-->
-<!--						} else {-->
-<!--							alert(data.message);-->
-<!--						}-->
-<!--					})-->
-<!--					.catch(error => {-->
-<!--						console.error('Error:', error);-->
-<!--						alert('登录请求失败');-->
-<!--					});-->
-<!--					-->
-<!--				});-->
-<!--			-->
-<!--			});-->
-		
-		
-		</script> -->
 		<script>
-			(function($, doc) {
-				$.init({
-					statusBarBackground: '#f7f7f7'
-				});
-				$.plusReady(function() {
-					plus.screen.lockOrientation("portrait-primary");
-					var settings = app.getSettings();
-					var state = app.getState();
-					var mainPage = plus.webview.getWebviewById("main");
-					var main_loaded_flag = false;
-
-
-					var toMain = function() {
-					// 发送请求到服务器获取用户职业信息
-					fetch('https://ts.tuotuohome.asia/check_occu.php', {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded',
-						},
-						body: 'username=' + encodeURIComponent(document.getElementById('account').value) // 假设你有用户的用户名
-					})
-					.then(response => response.json())
-					.then(data => {
-						if(data.success) {
-							localStorage.setItem('user_name', document.getElementById('account').value);
-
-							// 根据职业信息决定跳转到哪个页面
-							var pageUrl = '';
-							switch(data.occupation) {
-								case 'guard':
-									pageUrl = 'guard_main.html';
-									break;
-								case 'rider':
-									pageUrl = 'rider_main.html';
-									break;
-								default:
-									console.log('未知职业');
-									return; // 或者跳转到一个默认页面
-							}
-							// 使用mui的方法或其他逻辑来跳转页面
-							mui.openWindow({
-								url: pageUrl,
-								id: 'main',
-								preload: true // 根据需要决定是否预加载
-							});
-						} else {
-							console.log('获取职业信息失败');
-							console.log('服务器返回的原始数据:', JSON.stringify(data), document.getElementById('account').value); // 将对象转换为字符串
-
-						}
-					})
-
-					.catch(error => {
-						console.error('请求职业信息出错', error);
-						
-					});
-					};
-					//检查 "登录状态/锁屏状态" 开始
-					if (settings.autoLogin && state.token && settings.gestures) {
-						$.openWindow({
-							url: 'unlock.html',
-							id: 'unlock',
-							show: {
-								aniShow: 'pop-in'
-							},
-							waiting: {
-								autoShow: false
-							}
-						});
-					} else if (settings.autoLogin && state.token) {
-						toMain();
-					} else {
-						app.setState(null);
-						//第三方登录
-						var authBtns = ['qihoo', 'weixin', 'sinaweibo', 'qq']; //配置业务支持的第三方登录
-						var auths = {};
-						var oauthArea = doc.querySelector('.oauth-area');
-						plus.oauth.getServices(function(services) {
-							for (var i in services) {
-								var service = services[i];
-								auths[service.id] = service;
-								if (~authBtns.indexOf(service.id)) {
-									var isInstalled = app.isInstalled(service.id);
-									var btn = document.createElement('div');
-									//如果微信未安装，则为不启用状态
-									btn.setAttribute('class', 'oauth-btn' + (!isInstalled && service.id === 'weixin' ? (' disabled') : ''));
-									btn.authId = service.id;
-									btn.style.backgroundImage = 'url("images/' + service.id + '.png")'
-									oauthArea.appendChild(btn);
-								}
-							}
-							$(oauthArea).on('tap', '.oauth-btn', function() {
-								if (this.classList.contains('disabled')) {
-									plus.nativeUI.toast('You have not installed the client');
-									return;
-								}
-								var auth = auths[this.authId];
-								var waiting = plus.nativeUI.showWaiting();
-								auth.login(function() {
-									waiting.close();
-									plus.nativeUI.toast("Login Authentication Successful");
-									auth.getUserInfo(function() {
-										plus.nativeUI.toast("Get user information successfully");
-										var name = auth.userInfo.nickname || auth.userInfo.name;
-										app.createState(name, function() {
-											toMain();
-										});
-									}, function(e) {
-										plus.nativeUI.toast("Failed to get user information:" + e.message);
-									});
-								}, function(e) {
-									waiting.close();
-									plus.nativeUI.toast("Login authentication failed:" + e.message);
-								});
-							});
-						}, function(e) {
-							oauthArea.style.display = 'none';
-							plus.nativeUI.toast("Failed to get login authentication:" + e.message);
-						});
-					}
-					// close splash
-					setTimeout(function() {
-						//关闭 splash
-						plus.navigator.closeSplashscreen();
-					}, 600);
-					//检查 "登录状态/锁屏状态" 结束
-					var loginButton = doc.getElementById('login');
-					var accountBox = doc.getElementById('account');
-					var passwordBox = doc.getElementById('password');
-					var autoLoginButton = doc.getElementById("autoLogin");
-					var regButton = doc.getElementById('reg');
-					var forgetButton = doc.getElementById('forgetPassword');
-					loginButton.addEventListener('tap', function(event) {
-						var loginInfo = {
-							account: accountBox.value,
-							password: passwordBox.value
-						};
-						app.login(loginInfo, function(err) {
-							if (err) {
-								plus.nativeUI.toast(err);
-								return;
-							}
-							toMain();
-						});
-					});
-					$.enterfocus('#login-form input', function() {
-						$.trigger(loginButton, 'tap');
-					});
-					autoLoginButton.classList[settings.autoLogin ? 'add' : 'remove']('mui-active')
-					autoLoginButton.addEventListener('toggle', function(event) {
-						setTimeout(function() {
-							var isActive = event.detail.isActive;
-							settings.autoLogin = isActive;
-							app.setSettings(settings);
-						}, 50);
-					}, false);
-					regButton.addEventListener('tap', function(event) {
-						$.openWindow({
-							url: 'occupation.html',
-							id: 'reg',
-							preload: true,
-							show: {
-								aniShow: 'pop-in'
-							},
-							styles: {
-								popGesture: 'hide'
-							},
-							waiting: {
-								autoShow: false
-							}
-						});
-					}, false);
-					forgetButton.addEventListener('tap', function(event) {
-						$.openWindow({
-							url: 'forget_password.html',
-							id: 'forget_password',
-							preload: true,
-							show: {
-								aniShow: 'pop-in'
-							},
-							styles: {
-								popGesture: 'hide'
-							},
-							waiting: {
-								autoShow: false
-							}
-						});
-					}, false);
-					//
-					window.addEventListener('resize', function() {
-						oauthArea.style.display = document.body.clientHeight > 400 ? 'block' : 'none';
-					}, false);
-					//
-					var backButtonPress = 0;
-					$.back = function(event) {
-						backButtonPress++;
-						if (backButtonPress > 1) {
-							plus.runtime.quit();
-						} else {
-							plus.nativeUI.toast('Press again to exit the application');
-						}
-						setTimeout(function() {
-							backButtonPress = 0;
-						}, 1000);
-						return false;
-					};
-				});
-			}(mui, document));
+		    (function($, doc) {
+		        $.init({
+		            statusBarBackground: '#f7f7f7'
+		        });
+		        $.plusReady(function() {
+		            plus.screen.lockOrientation("portrait-primary");
+		            var settings = app.getSettings();
+		            var state = app.getState();
+		
+		            var toMain = function() {
+		                // 使用用户名和密码发送请求到服务器进行登录验证
+		                var accountValue = document.getElementById('account').value;
+		                var passwordValue = document.getElementById('password').value;
+		                fetch('https://ts.tuotuohome.asia/login.php', {
+		                    method: 'POST',
+		                    headers: {
+		                        'Content-Type': 'application/x-www-form-urlencoded',
+		                    },
+		                    body: 'username=' + encodeURIComponent(accountValue) + '&password=' + encodeURIComponent(passwordValue)
+		                })
+		                .then(response => response.json())
+		                .then(data => {
+		                    if (data.success) {
+		                        localStorage.setItem('user_name', accountValue);
+		
+		                        // 根据职业信息决定跳转到哪个页面
+		                        var pageUrl = '';
+		                        switch (data.occupation) {
+		                            case 'guard':
+		                                pageUrl = 'guard_main.html';
+		                                break;
+		                            case 'rider':
+		                                pageUrl = 'rider_main.html';
+		                                break;
+		                            default:
+		                                plus.nativeUI.toast('Unknown occupation');
+		                                return;
+		                        }
+		                        // 使用mui的方法或其他逻辑来跳转页面
+		                        mui.openWindow({
+		                            url: pageUrl,
+		                            id: 'main',
+		                            preload: true
+		                        });
+		                    } else {
+		                        plus.nativeUI.toast('Login failed: ' + data.message);
+		                    }
+		                })
+		                .catch(error => {
+		                    console.error('Error:', error);
+		                    plus.nativeUI.toast('Login request failed');
+		                });
+		            };
+		
+		            if (settings.autoLogin && state.token && settings.gestures) {
+		                $.openWindow({
+		                    url: 'unlock.html',
+		                    id: 'unlock',
+		                    show: {
+		                        aniShow: 'pop-in'
+		                    },
+		                    waiting: {
+		                        autoShow: false
+		                    }
+		                });
+		            } else if (settings.autoLogin && state.token) {
+		                toMain();
+		            } else {
+		                app.setState(null);
+		                var authBtns = ['qihoo', 'weixin', 'sinaweibo', 'qq']; // 配置业务支持的第三方登录
+		                var auths = {};
+		                var oauthArea = doc.querySelector('.oauth-area');
+		                plus.oauth.getServices(function(services) {
+		                    for (var i in services) {
+		                        var service = services[i];
+		                        auths[service.id] = service;
+		                        if (~authBtns.indexOf(service.id)) {
+		                            var isInstalled = app.isInstalled(service.id);
+		                            var btn = document.createElement('div');
+		                            // 如果微信未安装，则为不启用状态
+		                            btn.setAttribute('class', 'oauth-btn' + (!isInstalled && service.id === 'weixin' ? (' disabled') : ''));
+		                            btn.authId = service.id;
+		                            btn.style.backgroundImage = 'url("images/' + service.id + '.png")'
+		                            oauthArea.appendChild(btn);
+		                        }
+		                    }
+		                    $(oauthArea).on('tap', '.oauth-btn', function() {
+		                        if (this.classList.contains('disabled')) {
+		                            plus.nativeUI.toast('You have not installed the client');
+		                            return;
+		                        }
+		                        var auth = auths[this.authId];
+		                        var waiting = plus.nativeUI.showWaiting();
+		                        auth.login(function() {
+		                            waiting.close();
+		                            plus.nativeUI.toast("Login Authentication Successful");
+		                            auth.getUserInfo(function() {
+		                                plus.nativeUI.toast("Get user information successfully");
+		                                var name = auth.userInfo.nickname || auth.userInfo.name;
+		                                app.createState(name, function() {
+		                                    toMain();
+		                                });
+		                            }, function(e) {
+		                                plus.nativeUI.toast("Failed to get user information:" + e.message);
+		                            });
+		                        }, function(e) {
+		                            waiting.close();
+		                            plus.nativeUI.toast("Login authentication failed:" + e.message);
+		                        });
+		                    });
+		                }, function(e) {
+		                    oauthArea.style.display = 'none';
+		                    plus.nativeUI.toast("Failed to get login authentication services:" + e.message);
+		                });
+		            }
+		            
+		            // Close splash screen
+		            setTimeout(function() {
+		                plus.navigator.closeSplashscreen();
+		            }, 600);
+		
+		            var loginButton = doc.getElementById('login');
+		            var accountBox = doc.getElementById('account');
+		            var passwordBox = doc.getElementById('password');
+		            var autoLoginButton = doc.getElementById("autoLogin");
+		            var regButton = doc.getElementById('reg');
+		            var forgetButton = doc.getElementById('forgetPassword');
+		
+		            loginButton.addEventListener('tap', function(event) {
+		                toMain(); // Adjusted to use toMain for login process
+		            });
+		
+		            $.enterfocus('#login-form input', function() {
+		                $.trigger(loginButton, 'tap');
+		            });
+		
+		            autoLoginButton.classList[settings.autoLogin ? 'add' : 'remove']('mui-active');
+		            autoLoginButton.addEventListener('toggle', function(event) {
+		                setTimeout(function() {
+		                    var isActive = event.detail.isActive;
+		                    settings.autoLogin = isActive;
+		                    app.setSettings(settings);
+		                }, 50);
+		            }, false);
+		
+		            regButton.addEventListener('tap', function(event) {
+		                $.openWindow({
+		                    url: 'occupation.html',
+		                    id: 'reg',
+		                    preload: true,
+		                    show: {
+		                        aniShow: 'pop-in'
+		                    },
+		                    styles: {
+		                        popGesture: 'hide'
+		                    },
+		                    waiting: {
+		                        autoShow: false
+		                    }
+		                });
+		            }, false);
+		
+		            forgetButton.addEventListener('tap', function(event) {
+		                $.openWindow({
+		                    url: 'forget_password.html',
+		                    id: 'forget_password',
+		                    preload: true,
+		                    show: {
+		                        aniShow: 'pop-in'
+		                    },
+		                    styles: {
+		                        popGesture: 'hide'
+		                    },
+		                    waiting: {
+		                        autoShow: false
+		                    }
+		                });
+		            }, false);
+		
+		            window.addEventListener('resize', function() {
+		                oauthArea.style.display = document.body.clientHeight > 400 ? 'block' : 'none';
+		            }, false);
+		
+		            var backButtonPress = 0;
+		            $.back = function(event) {
+		                backButtonPress++;
+		                if (backButtonPress > 1) {
+		                    plus.runtime.quit();
+		                } else {
+		                    plus.nativeUI.toast('Press again to exit the application');
+		                }
+		                setTimeout(function() {
+		                    backButtonPress = 0;
+		                }, 1000);
+		                return false;
+		            };
+		        });
+		    }(mui, document));
 		</script>
-		<script>
 
-		</script>
+
+
+
 
 
 	</body>

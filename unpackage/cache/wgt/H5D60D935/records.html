@@ -39,13 +39,44 @@
 				background-color: #ffa52a;
 				border-style: none;
 			}
+			/* Adjusted Table Styles for .recordsTable */
+			.recordsTable {
+			    width: 80%; /* Adjusted width to make the table narrower */
+			    max-width: 600px; /* Maximum width of the table */
+			    margin: 20px auto; /* Center table with some space above and below */
+			    border-collapse: collapse; /* Collapse cell borders */
+			}
+			
+			.recordsTable th, .recordsTable td {
+			    border: 1px solid #ddd; /* Light border for cells */
+			    text-align: left; /* Align text to the left */
+			    padding: 8px; /* Padding inside cells */
+			}
+			
+			.recordsTable th {
+			    background-color: #f2f2f2; /* Light gray background for header cells */
+			    color: #333; /* Darker text color for headers for better contrast */
+			}
+			
+			.recordsTable tr:nth-child(even) {
+			    background-color: #f9f9f9; /* Lighter gray for even rows */
+			}
+			
+			.recordsTable tr:hover {
+			    background-color: #f1f1f1; /* Slightly darker gray on row hover for better interaction feedback */
+			}
+
+
+	
 		</style>
+		
 	</head>
 
 	<body>
 		<header class="mui-bar mui-bar-nav">
 			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
 			<h1 class="mui-title">Personnel access records</h1>
+			<button id='setting' class=" mui-pull-right mui-btn-link">Refresh</button>
 		</header>
 		<div class="mui-content">
 			
@@ -56,11 +87,81 @@
 				</div>             	
                 -->
 				
-		
+		<h2>Rider Records</h2>
+		    <br><br>
+			<div class="table-container">
+				<table id="recordsTable" class="recordsTable" border="1">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Rider</th>
+							<th>QR Time</th>
+							<th>Address</th>
+							<th>Guard</th>
+							<th>Scan Time</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- Records will be inserted here -->
+					</tbody>
+				</table>
+			</div>
 
 		</div>
 		<script src="js/mui.min.js"></script>
 		<script src="js/app.js"></script>
+		<script>
+		  // 假设其他代码保持不变，只修改fetchRiderRecords函数
+		var testun = "qweqwe";
+		function fetchRiderRecords() {
+		    var username = localStorage.getItem('user_name'); // 获取用户名
+		    // 使用提供的URL并附加用户名作为查询参数
+		    fetch(`https://ts.tuotuohome.asia/getRiderRecords.php?rider=${username}`)
+		      .then(response => response.json())
+		      .then(data => {
+		        const tableBody = document.getElementById('recordsTable').getElementsByTagName('tbody')[0];
+		        tableBody.innerHTML = ''; // 清空之前的结果
+		
+		        // 初始化行号计数器
+		        let rowNumber = 1;
+		
+		        data.forEach(record => {
+		          // 转换时间戳为北京时间
+		          let qrTime = new Date(record.QRtime).toLocaleString("zh-CN", {timeZone: "Asia/Shanghai"});
+		          let scanTime = new Date(record.scanTime * 1000).toLocaleString("zh-CN", {timeZone: "Asia/Shanghai"});
+		
+		          // 使用 rowNumber 作为表格中的行号
+		          const row = `<tr>
+		                        <td>${rowNumber++}</td> <!-- 使用并增加行号 -->
+		                        <td>${record.rider}</td>
+		                        <td>${qrTime}</td>
+		                        <td>${record.address}</td>
+		                        <td>${record.guard}</td>
+		                        <td>${scanTime}</td>
+		                       </tr>`;
+		
+		          tableBody.innerHTML += row;
+		        });
+		      })
+		      .catch(error => console.error('Error fetching data:', error));
+		}
+
+
+
+		  // 假设在某个地方调用fetchRiderRecords函数，例如：
+		  // 在页面加载完成后自动获取记录，或者绑定到某个按钮的点击事件
+			// DOMContentLoaded 事件监听器以及刷新按钮的点击事件处理
+				document.addEventListener('DOMContentLoaded', function() {
+					fetchRiderRecords(); // 页面加载完成后自动获取记录
+
+					var refreshButton = document.getElementById('setting'); // 获取刷新按钮
+					refreshButton.addEventListener('click', function() {
+						fetchRiderRecords(); // 当按钮被点击时，再次调用 fetchRiderRecords 函数
+					});
+				});
+		</script>
+
+
 		
 	</body>
 

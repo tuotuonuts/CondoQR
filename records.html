@@ -39,16 +39,33 @@
 				background-color: #ffa52a;
 				border-style: none;
 			}
-			.table-container {
-			    box-sizing: border-box;
-			    width: 10 %;
-				margin: 0 auto;
-			}
+			/* Adjusted Table Styles for .recordsTable */
 			.recordsTable {
-			    width: 95%;
-			    margin-left: auto;
-			    margin-right: auto;
+			    width: 80%; /* Adjusted width to make the table narrower */
+			    max-width: 600px; /* Maximum width of the table */
+			    margin: 20px auto; /* Center table with some space above and below */
+			    border-collapse: collapse; /* Collapse cell borders */
 			}
+			
+			.recordsTable th, .recordsTable td {
+			    border: 1px solid #ddd; /* Light border for cells */
+			    text-align: left; /* Align text to the left */
+			    padding: 8px; /* Padding inside cells */
+			}
+			
+			.recordsTable th {
+			    background-color: #f2f2f2; /* Light gray background for header cells */
+			    color: #333; /* Darker text color for headers for better contrast */
+			}
+			
+			.recordsTable tr:nth-child(even) {
+			    background-color: #f9f9f9; /* Lighter gray for even rows */
+			}
+			
+			.recordsTable tr:hover {
+			    background-color: #f1f1f1; /* Slightly darker gray on row hover for better interaction feedback */
+			}
+
 
 	
 		</style>
@@ -99,7 +116,7 @@
 		function fetchRiderRecords() {
 		    var username = localStorage.getItem('user_name'); // 获取用户名
 		    // 使用提供的URL并附加用户名作为查询参数
-		    fetch(`https://ts.tuotuohome.asia/getRiderRecords.php?rider=${testun}`)
+		    fetch(`https://ts.tuotuohome.asia/getRiderRecords.php?rider=${username}`)
 		      .then(response => response.json())
 		      .then(data => {
 		        const tableBody = document.getElementById('recordsTable').getElementsByTagName('tbody')[0];
