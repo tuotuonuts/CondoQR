@@ -1,12 +1,15 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json");
+
 // 数据库连接信息
-$servername = "your_server_name";
-$username = "your_database_username";
-$password = "your_database_password";
-$dbname = "your_database_name";
+$servername = "";
+$username = "";
+$password = "";
+$db_name = "";
 
 // 创建数据库连接
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $password, $db_name);
 
 // 检查连接
 if ($conn->connect_error) {
@@ -23,7 +26,7 @@ $user_username = isset($_POST['username']) ? $_POST['username'] : '';
 $user_username = $conn->real_escape_string($user_username);
 
 // 查询数据库，检查用户是否存在并获取其职业（occu）
-$sql = "SELECT occu FROM users WHERE username = '$user_username'";
+$sql = "SELECT occu FROM condoQR WHERE username = '$user_username'";
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {

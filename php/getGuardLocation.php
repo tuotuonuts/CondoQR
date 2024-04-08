@@ -2,10 +2,10 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 
-$servername = "tuotuohome.asia";
-$username = "tuotuo";
-$password = "zrd00531";
-$db_name = "mydatabase";
+$servername = "";
+$username = "";
+$password = "";
+$db_name = "";
 
 // 创建连接
 $conn = new mysqli($servername, $username, $password, $db_name);
