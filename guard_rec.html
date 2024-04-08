@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html class="ui-page-login">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/style.css" rel="stylesheet" />
+		<style>
+			.area {
+				margin: 20px auto 0px auto;
+			}
+			.mui-input-group:first-child {
+				margin-top: 20px;
+			}
+			.mui-input-group label {
+				width: 22%;
+			}
+			.mui-input-row label~input,
+			.mui-input-row label~select,
+			.mui-input-row label~textarea {
+				width: 78%;
+			}
+			.mui-checkbox input[type=checkbox],
+			.mui-radio input[type=radio] {
+				top: 6px;
+			}
+			.mui-content-padded {
+				margin-top: 25px;
+			}
+			.mui-btn {
+				padding: 10px;
+			}
+			.mui-input-row label~input, .mui-input-row label~select, .mui-input-row label~textarea{
+				margin-top: 1px;
+			}
+			.mui-btn-primary{
+				background-color: #ffa52a;
+				border-style: none;
+			}
+			.table-container {
+			    box-sizing: border-box;
+			    width: 10 %;
+				margin: 0 auto;
+			}
+			.recordsTable {
+			    width: 95%;
+			    margin-left: auto;
+			    margin-right: auto;
+			}
+			/* Basic Table Styles */
+			table {
+			    width: 100%; /* Set table to take full width of its container */
+			    border-collapse: collapse; /* Collapse cell borders */
+			    margin-top: 20px; /* Add some space above the table */
+			}
+			
+			th, td {
+			    border: 1px solid #ddd; /* Add a light border to table headers and cells */
+			    text-align: left; /* Align text to the left */
+			    padding: 8px; /* Add some padding inside cells */
+			}
+			
+			th {
+			    background-color: #f2f2f2; /* Add a light gray background to headers */
+			}
+			
+			/* Style for Overtime Table rows */
+			#overtimeTable tr {
+			    background-color: #ffcccc; /* Light red background for overtime rows */
+			}
+
+
+	
+		</style>
+		
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">Personnel access records</h1>
+			<button id='refresh' class="mui-pull-right mui-btn-link">Refresh</button>
+		</header>
+		<div class="mui-content">
+		    <div id="systemTime"></div>
+		    <h2>Overtime Personnel</h2>
+		    <table id="overtimeTable">
+		        <thead>
+		            <tr>
+		                <th>Rider</th>
+		                <th>Scan Time</th>
+		            </tr>
+		        </thead>
+		        <tbody>
+		            <!-- Overtime records will be inserted here -->
+		        </tbody>
+		    </table>
+		    <h2>Rider Records</h2>
+		    <table id="recordsTable">
+		        <thead>
+		            <tr>
+		                <th>Rider</th>
+		                <th>Scan Time</th>
+		            </tr>
+		        </thead>
+		        <tbody>
+		            <!-- Rider records will be inserted here -->
+		        </tbody>
+		    </table>
+		</div>
+
+		<script src="js/mui.min.js"></script>
+		<script src="js/app.js"></script>
+		<script>
+		    // Function to update the system time
+		    function updateSystemTime() {
+		        const now = new Date();
+		        const timeString = now.toISOString().slice(0, 19).replace('T', ' ');
+		        document.getElementById('systemTime').textContent = timeString;
+		    }
+		    setInterval(updateSystemTime, 1000); // Update every second
+		
+		    console.log("Hello");
+		
+		    // Function to fetch and display records
+			function fetchAndDisplayRecords() {
+				try {
+					console.log("Attempting to fetch records...");
+					const username = localStorage.getItem('user_name');
+					if (!username) {
+						console.error("Username not found in localStorage.");
+						return; // Exit the function if username is not set
+					}
+					console.log("Username retrieved: ", username);
+
+					fetch(`https://ts.tuotuohome.asia/fetchRecords.php?guard=${encodeURIComponent(username)}`)
+						.then(response => {
+							if (!response.ok) {
+								throw new Error('Network response was not ok');
+							}
+							return response.json();
+						})
+						.then(data => {
+							console.log("Data received: ", data);
+							if (data.status === "success" && Array.isArray(data.data)) {
+								const currentTime = Date.now();
+								
+								// 对于所有记录，直接插入到 "Rider Records"
+								insertRecords(data.data, 'recordsTable');
+								
+								// 筛选超时15分钟以上的记录并插入到 "Overtime Personnel"
+								const overtimeRecords = data.data.filter(record => currentTime - parseInt(record.scanTime) * 1000 > 900000);
+								insertRecords(overtimeRecords, 'overtimeTable');
+							} else if (data.status === "error") {
+								console.error('Server returned an error: ', data.message);
+							} else {
+								throw new Error('Invalid data format received from server');
+							}
+						})
+						.catch(error => console.error('Error fetching records:', error));
+				} catch (error) {
+					console.error('An error occurred in fetchAndDisplayRecords:', error);
+				}
+			}
+
+
+			function insertRecords(records, tableId) {
+				const table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
+				table.innerHTML = ''; // Clear existing records
+				records.forEach(record => {
+					const row = table.insertRow();
+					const riderCell = row.insertCell(0);
+					const scanTimeCell = row.insertCell(1);
+					riderCell.textContent = record.rider;
+					// Multiply scanTime by 1000 to convert to milliseconds
+					scanTimeCell.textContent = new Date(record.scanTime * 1000).toLocaleString("zh-CN", {timeZone: "Asia/Shanghai"});
+					if (tableId === 'overtimeTable') {
+						row.style.color = 'red'; // Highlight overdue records
+					}
+				});
+			}
+	
+
+			document.getElementById('refresh').addEventListener('click', fetchAndDisplayRecords);
+
+			// Ensure fetchAndDisplayRecords is called after the window is fully loaded
+			window.onload = function() {
+				console.log('Window loaded, now fetching records...');
+				fetchAndDisplayRecords();
+			};
+
+			window.onload = function() {
+				console.log('Window loaded, now fetching records...');
+				fetchAndDisplayRecords();
+			};
+
+		</script>
+
+
+
+		
+	</body>
+
+</html>

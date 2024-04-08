@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html class="ui-page-login">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/style.css" rel="stylesheet" />
+		<style>
+			.area {
+				margin: 20px auto 0px auto;
+			}
+			
+			.mui-input-group {
+				margin-top: 10px;
+			}
+			
+			.mui-input-group:first-child {
+				margin-top: 20px;
+			}
+			
+			.mui-input-group label {
+				width: 22%;
+			}
+			
+			.mui-input-row label~input,
+			.mui-input-row label~select,
+			.mui-input-row label~textarea {
+				width: 78%;
+			}
+			
+			.mui-checkbox input[type=checkbox],
+			.mui-radio input[type=radio] {
+				top: 6px;
+			}
+			
+			.mui-content-padded {
+				margin-top: 25px;
+			}
+			
+			.mui-btn {
+				padding: 10px;
+			}
+			
+			.link-area {
+				display: block;
+				margin-top: 25px;
+				text-align: center;
+			}
+			
+			.spliter {
+				color: #bbb;
+				padding: 0px 8px;
+			}
+			
+			.oauth-area {
+				position: absolute;
+				bottom: 20px;
+				left: 0px;
+				text-align: center;
+				width: 100%;
+				padding: 0px;
+				margin: 0px;
+			}
+			
+			.oauth-area .oauth-btn {
+				display: inline-block;
+				width: 50px;
+				height: 50px;
+				background-size: 30px 30px;
+				background-position: center center;
+				background-repeat: no-repeat;
+				margin: 0px 20px;
+				/*-webkit-filter: grayscale(100%); */
+				border: solid 1px #ddd;
+				border-radius: 25px;
+			}
+			
+			.oauth-area .oauth-btn:active {
+				border: solid 1px #aaa;
+			}
+			
+			.oauth-area .oauth-btn.disabled {
+				background-color: #ddd;
+			}
+		</style>
+
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">Log in</h1>
+		</header>
+		<div class="mui-content">
+			<form id='login-form' class="mui-input-group">
+				<div class="mui-input-row">
+					<label>Username</label>
+					<input id='account' type="text" class="mui-input-clear mui-input" placeholder="  Please enter the username">
+				</div>
+				<div class="mui-input-row">
+					<label>Password</label>
+					<input id='password' type="password" class="mui-input-clear mui-input" placeholder="  Please enter the Password">
+				</div>
+			</form>
+			<form class="mui-input-group">
+				<ul class="mui-table-view mui-table-view-chevron">
+					<li class="mui-table-view-cell">
+						Remember me
+						<div id="autoLogin" class="mui-switch">
+							<div class="mui-switch-handle"></div>
+						</div>
+					</li>
+				</ul>
+			</form>
+			<div class="mui-content-padded">
+				<button id='login' class="mui-btn mui-btn-block mui-btn-primary">Log in</button>
+				<div class="link-area"><a id='reg'>Register account</a> <span class="spliter">|</span> <a id='forgetPassword'>Forget the password</a>
+				</div>
+			</div>
+			<div class="mui-content-padded oauth-area">
+
+			</div>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/mui.enterfocus.js"></script>
+		<script src="js/app.js"></script>
+		<script>
+		(function($, doc) {
+		    $.init({
+		        statusBarBackground: '#f7f7f7'
+		    });
+		    $.plusReady(function() {
+		        plus.screen.lockOrientation("portrait-primary");
+		        var settings = app.getSettings();
+		        var state = app.getState();
+		        var oauthArea = doc.querySelector('.oauth-area');
+		
+		        // 登录逻辑处理
+		        var handleLogin = function() {
+		            var username = document.getElementById('account').value;
+		            var password = document.getElementById('password').value;
+		            
+		            fetch('https://ts.tuotuohome.asia/login.php', {
+		                method: 'POST',
+		                headers: {
+		                    'Content-Type': 'application/x-www-form-urlencoded',
+		                },
+		                body: 'username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password)
+		            })
+		            .then(response => {
+		                if (response.ok) {
+		                    return response.text().then(text => {
+		                        try {
+		                            return JSON.parse(text);
+		                        } catch (error) {
+		                            // 如果响应不是JSON格式，抛出错误以展示原始响应文本
+		                            throw new Error('Response not JSON: ' + text);
+		                        }
+		                    });
+		                } else {
+		                    // 对于非200-299的响应，读取响应文本并抛出错误
+		                    return response.text().then(text => {
+		                        throw new Error('Server Error: ' + text);
+		                    });
+		                }
+		            })
+		            .then(data => {
+		                if (data.success) {
+		                    localStorage.setItem('user_name', username);
+		                    var pageUrl = data.occupation === 'guard' ? 'guard_main.html' : 'rider_main.html';
+		                    mui.openWindow({
+		                        url: pageUrl,
+		                        id: 'main',
+		                        preload: true
+		                    });
+		                } else {
+		                    plus.nativeUI.toast(data.message || 'Login validation failed.');
+		                }
+		            })
+		            .catch(error => {
+		                console.error('Login request or processing failed:', error);
+		                plus.nativeUI.toast('Login request failed. Please check console for more details.');
+		            });
+		        };
+		
+		        var loginButton = doc.getElementById('login');
+		        loginButton.addEventListener('tap', handleLogin);
+		
+		        // 处理自动登录按钮
+		        var autoLoginButton = doc.getElementById("autoLogin");
+		        autoLoginButton.classList[settings.autoLogin ? 'add' : 'remove']('mui-active');
+		        autoLoginButton.addEventListener('toggle', function(event) {
+		            setTimeout(function() {
+		                var isActive = event.detail.isActive;
+		                settings.autoLogin = isActive;
+		                app.setSettings(settings);
+		            }, 50);
+		        }, false);
+		
+		        // 注册和忘记密码按钮逻辑
+		        var regButton = doc.getElementById('reg');
+		        regButton.addEventListener('tap', function(event) {
+		            $.openWindow({
+		                url: 'reg.html',
+		                id: 'reg',
+		                preload: true
+		            });
+		        }, false);
+		
+		        var forgetButton = doc.getElementById('forgetPassword');
+		        forgetButton.addEventListener('tap', function(event) {
+		            $.openWindow({
+		                url: 'forget_password.html',
+		                id: 'forget_password',
+		                preload: true
+		            });
+		        }, false);
+		
+		        // 第三方登录服务获取
+		        var authBtns = ['qihoo', 'weixin', 'sinaweibo', 'qq']; // 配置支持的第三方登录
+		        var auths = {};
+		        plus.oauth.getServices(function(services) {
+		            for (var i in services) {
+		                var service = services[i];
+		                auths[service.id] = service;
+		                if (~authBtns.indexOf(service.id)) {
+		                    var isInstalled = app.isInstalled(service.id);
+		                    var btn = document.createElement('div');
+		                    btn.setAttribute('class', 'oauth-btn' + (!isInstalled && service.id === 'weixin' ? ' disabled' : ''));
+		                    btn.authId = service.id;
+		                    btn.style.backgroundImage = 'url("images/' + service.id + '.png")';
+		                    oauthArea.appendChild(btn);
+		                }
+		            }
+		            $(oauthArea).on('tap', '.oauth-btn', function() {
+		                if (this.classList.contains('disabled')) {
+		                    plus.nativeUI.toast('You have not installed the client');
+		                    return;
+		                }
+		                var auth = auths[this.authId];
+		                var waiting = plus.nativeUI.showWaiting();
+		                auth.login(function() {
+		                    waiting.close();
+		                    plus.nativeUI.toast("Login Authentication Successful");
+		                    auth.getUserInfo(function() {
+		                        plus.nativeUI.toast("Get user information successfully");
+		                        var name = auth.userInfo.nickname || auth.userInfo.name;
+		                        app.createState(name, function() {
+		                            handleLogin();
+		                        });
+		                    }, function(e) {
+		                        plus.nativeUI.toast("Failed to get user information:" + e.message);
+		                    });
+		                }, function(e) {
+		                    waiting.close();
+		                    plus.nativeUI.toast("Login authentication failed:" + e.message);
+		                });
+		            });
+		        }, function(e) {
+		            oauthArea.style.display = 'none';
+		            plus.nativeUI.toast("Failed to get login authentication services:" + e.message);
+		        });
+		
+		        // 自动聚焦到下一个输入框
+		        $.enterfocus('#login-form input', function() {
+		            $.trigger(loginButton, 'tap');
+		        });
+		
+		        // 调整布局逻辑根据屏幕大小显示或隐藏OAuth区域
+		        window.addEventListener('resize', function() {
+		            oauthArea.style.display = document.body.clientHeight > 400 ? 'block' : 'none';
+		        }, false);
+		
+		        // 处理返回键逻辑
+		        var backButtonPress = 0;
+		        $.back = function(event) {
+		            backButtonPress++;
+		            if (backButtonPress > 1) {
+		                plus.runtime.quit();
+		            } else {
+		                plus.nativeUI.toast('Press again to exit the application');
+		            }
+		            setTimeout(function() {
+		                backButtonPress = 0;
+		            }, 1000);
+		            return false;
+		        };
+		    });
+		}(mui, document));
+		</script>
+
+
+
+
+	</body>
+
+</html>
