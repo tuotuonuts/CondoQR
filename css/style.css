@@ -6,5 +6,9 @@ body {
 	padding: 0px;
 }
 .mui-content{height: 100%;}
+.mui-btn-primary{
+				background-color: #ffa52a;
+				border-style: none;
+			}
 
 
